@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.9.0" camunda:diagramRelationId="d1451d16-cbf4-4a65-b57e-930251e9548c">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" camunda:diagramRelationId="d1451d16-cbf4-4a65-b57e-930251e9548c">
   <bpmn:process id="order-coffee" name="Order Coffee" isExecutable="true" camunda:versionTag="1.0.0">
     <bpmn:startEvent id="Event_1a6pj9d" name="Order Coffee">
       <bpmn:outgoing>Flow_00iop9r</bpmn:outgoing>
@@ -11,7 +11,7 @@
     <bpmn:sequenceFlow id="Flow_0byan59" sourceRef="deliver-coffee-order" targetRef="Event_0vvkd3t" />
     <bpmn:sequenceFlow id="Flow_1endfqu" sourceRef="pour-coffee-in-cup" targetRef="deliver-coffee-order" />
     <bpmn:serviceTask id="make-coffee" name="Make Coffee" camunda:delegateExpression="${makeCoffee}">
-      <bpmn:incoming>Flow_13iul1u</bpmn:incoming>
+      <bpmn:incoming>Flow_19bie67</bpmn:incoming>
       <bpmn:outgoing>Flow_0br39mu</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="pour-coffee-in-cup" name="Pour Coffee in Cup" camunda:expression="${coffeeService.pourCoffee(execution)}">
@@ -25,17 +25,11 @@
     <bpmn:serviceTask id="retrieve-coffee-order" name="Retrieve Coffee Order" camunda:class="com.javanibble.camunda.examples.RetrieveCoffeeOrderDelegate">
       <bpmn:incoming>Flow_00iop9r</bpmn:incoming>
       <bpmn:outgoing>Flow_17tr72j</bpmn:outgoing>
+      <bpmn:outgoing>Flow_19bie67</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_17tr72j" sourceRef="retrieve-coffee-order" targetRef="Event_0vr3g6x" />
+    <bpmn:sequenceFlow id="Flow_17tr72j" sourceRef="retrieve-coffee-order" targetRef="Flow_0br39mu"/>
     <bpmn:sequenceFlow id="Flow_0br39mu" sourceRef="make-coffee" targetRef="pour-coffee-in-cup" />
-    <bpmn:intermediateCatchEvent id="Event_0vr3g6x">
-      <bpmn:incoming>Flow_17tr72j</bpmn:incoming>
-      <bpmn:outgoing>Flow_13iul1u</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_1sa6px2">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT10S</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_13iul1u" sourceRef="Event_0vr3g6x" targetRef="make-coffee" />
+    <bpmn:sequenceFlow id="Flow_19bie67" sourceRef="retrieve-coffee-order" targetRef="make-coffee" />
     <bpmn:textAnnotation id="TextAnnotation_0xjcrv5">
       <bpmn:text>Implementation: Java Class</bpmn:text>
     </bpmn:textAnnotation>
@@ -91,9 +85,6 @@
       <bpmndi:BPMNShape id="TextAnnotation_0dfsf8h_di" bpmnElement="TextAnnotation_0dfsf8h">
         <dc:Bounds x="710" y="85" width="100" height="40" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0vr3g6x_di" bpmnElement="Event_0vr3g6x">
-        <dc:Bounds x="442" y="292" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_00iop9r_di" bpmnElement="Flow_00iop9r">
         <di:waypoint x="208" y="200" />
         <di:waypoint x="310" y="200" />
@@ -105,12 +96,6 @@
       <bpmndi:BPMNEdge id="Flow_1endfqu_di" bpmnElement="Flow_1endfqu">
         <di:waypoint x="810" y="200" />
         <di:waypoint x="911" y="200" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_17tr72j_di" bpmnElement="Flow_17tr72j">
-        <di:waypoint x="410" y="200" />
-        <di:waypoint x="426" y="200" />
-        <di:waypoint x="426" y="310" />
-        <di:waypoint x="442" y="310" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0br39mu_di" bpmnElement="Flow_0br39mu">
         <di:waypoint x="610" y="200" />
@@ -132,10 +117,8 @@
         <di:waypoint x="760" y="160" />
         <di:waypoint x="760" y="125" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_13iul1u_di" bpmnElement="Flow_13iul1u">
-        <di:waypoint x="478" y="310" />
-        <di:waypoint x="494" y="310" />
-        <di:waypoint x="494" y="200" />
+      <bpmndi:BPMNEdge id="Flow_19bie67_di" bpmnElement="Flow_19bie67">
+        <di:waypoint x="410" y="200" />
         <di:waypoint x="510" y="200" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

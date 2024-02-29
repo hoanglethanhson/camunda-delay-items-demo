@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.util.Objects;
+
 @Configuration
 @Slf4j
 public class DelayItemsHandlingSchedule {
@@ -27,7 +29,7 @@ public class DelayItemsHandlingSchedule {
     public void handleDelayItems() {
         log.info("Handling delay items");
         //get all keys from redis by prefix
-        redisTemplate.keys(Constant.DELAY_ITEM_KEY_PREFIX + ":*").forEach(key -> {
+        Objects.requireNonNull(redisTemplate.keys(Constant.DELAY_ITEM_KEY_PREFIX + ":*")).forEach(key -> {
             String msisdn = key.split(":")[1];
             if (isItemReady(key)) {
                 log.info("Item is ready for msisdn: " + msisdn);
