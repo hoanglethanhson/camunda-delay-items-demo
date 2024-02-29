@@ -20,7 +20,7 @@ public class RetrieveCoffeeOrderDelegate implements JavaDelegate {
     private RuntimeService runtimeService;
 
     @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    RedisTemplate<String, Long> redisTemplate;
 
     private final Logger LOGGER = LoggerFactory.getLogger(RetrieveCoffeeOrderDelegate.class.getName());
 
@@ -34,7 +34,9 @@ public class RetrieveCoffeeOrderDelegate implements JavaDelegate {
         }
 
         LOGGER.info("Order Coffee Process: " + execution.getCurrentActivityName() + " - " + coffeeOrder);
-        redisTemplate.opsForValue().set(StringUtils.getRedisKey(msisdn, currentActivityId), LocalDateTime.now().toString());
+        redisTemplate.opsForValue().set(StringUtils.getRedisKey(msisdn, currentActivityId), System.currentTimeMillis());
+        //end curren process instance
+        runtimeService.correlateMessage("endProcess", msisdn);
     }
 
 }
