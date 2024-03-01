@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" camunda:diagramRelationId="d1451d16-cbf4-4a65-b57e-930251e9548c">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.9.0" camunda:diagramRelationId="d1451d16-cbf4-4a65-b57e-930251e9548c">
   <bpmn:process id="order-coffee" name="Order Coffee" isExecutable="true" camunda:versionTag="1.0.0">
     <bpmn:startEvent id="Event_1a6pj9d" name="Order Coffee">
       <bpmn:outgoing>Flow_00iop9r</bpmn:outgoing>
@@ -11,7 +11,7 @@
     <bpmn:sequenceFlow id="Flow_0byan59" sourceRef="deliver-coffee-order" targetRef="Event_0vvkd3t" />
     <bpmn:sequenceFlow id="Flow_1endfqu" sourceRef="pour-coffee-in-cup" targetRef="deliver-coffee-order" />
     <bpmn:serviceTask id="make-coffee" name="Make Coffee" camunda:delegateExpression="${makeCoffee}">
-      <bpmn:incoming>Flow_19bie67</bpmn:incoming>
+      <bpmn:incoming>Flow_1xhrbj9</bpmn:incoming>
       <bpmn:outgoing>Flow_0br39mu</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="pour-coffee-in-cup" name="Pour Coffee in Cup" camunda:expression="${coffeeService.pourCoffee(execution)}">
@@ -24,12 +24,10 @@
     </bpmn:serviceTask>
     <bpmn:serviceTask id="retrieve-coffee-order" name="Retrieve Coffee Order" camunda:class="com.javanibble.camunda.examples.RetrieveCoffeeOrderDelegate">
       <bpmn:incoming>Flow_00iop9r</bpmn:incoming>
-      <bpmn:outgoing>Flow_17tr72j</bpmn:outgoing>
-      <bpmn:outgoing>Flow_19bie67</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1xhrbj9</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_17tr72j" sourceRef="retrieve-coffee-order" targetRef="Flow_0br39mu"/>
     <bpmn:sequenceFlow id="Flow_0br39mu" sourceRef="make-coffee" targetRef="pour-coffee-in-cup" />
-    <bpmn:sequenceFlow id="Flow_19bie67" sourceRef="retrieve-coffee-order" targetRef="make-coffee" />
+    <bpmn:sequenceFlow id="Flow_1xhrbj9" sourceRef="retrieve-coffee-order" targetRef="make-coffee" />
     <bpmn:textAnnotation id="TextAnnotation_0xjcrv5">
       <bpmn:text>Implementation: Java Class</bpmn:text>
     </bpmn:textAnnotation>
@@ -117,7 +115,7 @@
         <di:waypoint x="760" y="160" />
         <di:waypoint x="760" y="125" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_19bie67_di" bpmnElement="Flow_19bie67">
+      <bpmndi:BPMNEdge id="Flow_1xhrbj9_di" bpmnElement="Flow_1xhrbj9">
         <di:waypoint x="410" y="200" />
         <di:waypoint x="510" y="200" />
       </bpmndi:BPMNEdge>

@@ -35,8 +35,9 @@ public class RetrieveCoffeeOrderDelegate implements JavaDelegate {
 
         LOGGER.info("Order Coffee Process: " + execution.getCurrentActivityName() + " - " + coffeeOrder);
         redisTemplate.opsForValue().set(StringUtils.getRedisKey(msisdn, currentActivityId), System.currentTimeMillis());
+        LOGGER.info("Key " + StringUtils.getRedisKey(msisdn, currentActivityId) + " is set" + " at " + LocalDateTime.now());
         //end curren process instance
-        runtimeService.correlateMessage("endProcess", msisdn);
+        runtimeService.deleteProcessInstance(execution.getProcessInstanceId(), "delay_item_caught");
     }
 
 }
