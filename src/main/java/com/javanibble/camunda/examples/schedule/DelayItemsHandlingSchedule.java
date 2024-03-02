@@ -1,7 +1,10 @@
 package com.javanibble.camunda.examples.schedule;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javanibble.camunda.examples.constant.Constant;
+import com.javanibble.camunda.examples.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Objects;
 
 @Configuration
@@ -21,41 +25,60 @@ public class DelayItemsHandlingSchedule {
     RuntimeService runtimeService;
 
     @Autowired
-    private RedisTemplate<String, Long> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Value("${app.delay-items.delay}")
     private Long delayDuration;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Scheduled(fixedRate = 1000L)
     public void handleDelayItems() {
-        //log.info("Handling delay items");
-        //get all keys from redis by prefix
         Objects.requireNonNull(redisTemplate.keys(Constant.DELAY_ITEM_KEY_PREFIX + ":*")).forEach(key -> {
-            String msisdn = key.split(":")[1];
-            if (isItemReady(key)) {
+            String msisdn = StringUtils.getMsisdn(key);
+            String execution;
+            try {
+                execution = getExecution(key);
+            } catch (JsonProcessingException e) {
+                log.error("Error while getting execution for msisdn: {}", msisdn, e);
+                throw new RuntimeException(e);
+            }
+            if (!Constant.DELAY_ITEMS_NOT_READY_STATUS.equals(execution)) {
                 log.info("Current time: {}, {}", System.currentTimeMillis(), LocalDateTime.now());
                 log.info("Item value {} is ready for msisdn: {}", redisTemplate.opsForValue().get(key), msisdn);
-                executeRemainingItems(msisdn);
+                executeRemainingItems(msisdn, execution);
                 redisTemplate.delete(key);
             }
         });
     }
 
-    private boolean isItemReady(String key) {
-        Long delayTimestamp = redisTemplate.opsForValue().get(key);
+    /**
+     * Get the next activity id from the key
+     * @param key
+     * @return next activity id if the delay time is passed, else return "NOTE_READY"
+     */
+    private String getExecution(String key) throws JsonProcessingException {
+        String nextActivityJson = (String) redisTemplate.opsForValue().get(key);
+        HashMap<String, Long> nextActivityMap = objectMapper.readValue(nextActivityJson, HashMap.class);
+        String nextActivityId = nextActivityMap.keySet().iterator().next();
+        Long delayTimestamp = nextActivityMap.get(nextActivityId);
         if (delayTimestamp == null) {
             log.info("delayTimestamp is null for key: {}", key);
-            return true;
+            return nextActivityId;
         }
-        return (delayTimestamp + delayDuration <= System.currentTimeMillis());
+        return (delayTimestamp + delayDuration <= System.currentTimeMillis()) ? nextActivityId
+                : Constant.DELAY_ITEMS_NOT_READY_STATUS;
     }
 
-    private void executeRemainingItems(String msisdn) {
+    //TODO: input variables through map
+    private void executeRemainingItems(String msisdn, String nextActivityId) {
         log.info("handling delay item for {}", msisdn);
         runtimeService.createProcessInstanceByKey("order-coffee-subprocess")
-                .startBeforeActivity("make-coffee")
+                .startBeforeActivity(nextActivityId)
                 .setVariable("order", "Latte")
                 .setVariable("msisdn", msisdn)
                 .execute();
     }
+
 }
